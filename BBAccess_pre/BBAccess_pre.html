@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合格への道</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,63 +30,58 @@
             border: none;
         }
     </style>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>合格への道</title>
 </head>
-
 <body>
-
     <div id="browser-view">
         <iframe id="iframe-view" src="" allow="fullscreen"></iframe>
     </div>
-</body>
 
-<script>
-    function loadPage() {
-    const url = 'https://bejewelled-paletas-a5969f.netlify.app/';
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    <script>
+        function loadPage() {
+            const url = 'https://bejewelled-paletas-a5969f.netlify.app/';
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
 
-    fetch(proxyUrl)
-        .then(response => {
-            if (!response.ok) throw new Error('NetworkError');
-            return response.text();
-        })
-        .then(modifiedHtml => {
-            const baseUrl = new URL(url);
-
-            let finalHtml = modifiedHtml
-                .replace(/<head>/i, `<head><base href="${baseUrl.href}">`)
-                .replace(/src="([^"]+)"/g, (match, src) => {
-                    if (src.startsWith('//')) {
-                        return `src="${baseUrl.protocol}${src}"`;
-                    }
-                    if (src.startsWith('/') || src.startsWith('./') || src.startsWith('../')) {
-                        return `src="${new URL(src, baseUrl.href).href}"`;
-                    }
-                    return `src="${src}"`;
+            fetch(proxyUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('NetworkError');
+                    return response.text();
                 })
-                .replace(/href="([^"]+)"/g, (match, href) => {
-                    if (href.startsWith('//')) {
-                        return `href="${baseUrl.protocol}${href}"`;
-                    }
-                    if (href.startsWith('/') || href.startsWith('./') || href.startsWith('../')) {
-                        return `href="${new URL(href, baseUrl.href).href}"`;
-                    }
-                    return `href="${href}"`;
+                .then(modifiedHtml => {
+                    const baseUrl = new URL(url);
+
+                    let finalHtml = modifiedHtml
+                        .replace(/<head>/i, `<head><base href="${baseUrl.href}">`)
+                        .replace(/src="([^"]+)"/g, (match, src) => {
+                            if (src.startsWith('//')) {
+                                return `src="${baseUrl.protocol}${src}"`;
+                            }
+                            if (src.startsWith('/') || src.startsWith('./') || src.startsWith('../')) {
+                                return `src="${new URL(src, baseUrl.href).href}"`;
+                            }
+                            return `src="${src}"`;
+                        })
+                        .replace(/href="([^"]+)"/g, (match, href) => {
+                            if (href.startsWith('//')) {
+                                return `href="${baseUrl.protocol}${href}"`;
+                            }
+                            if (href.startsWith('/') || href.startsWith('./') || href.startsWith('../')) {
+                                return `href="${new URL(href, baseUrl.href).href}"`;
+                            }
+                            return `href="${href}"`;
+                        });
+
+                    document.getElementById('iframe-view').srcdoc = finalHtml;
+                })
+                .catch(error => {
+                    document.getElementById('browser-view').innerHTML = `
+                        ページの読み込みに失敗しました。エラー: ${error.message} - 詳細: 
+                        プロキシサーバーの問題、またはクロスオリジンの制限が原因かもしれません。
+                    `;
+                    console.error('Error:', error);
                 });
+        }
 
-            document.getElementById('iframe-view').srcdoc = finalHtml;
-        })
-        .catch(error => {
-            document.getElementById('browser-view').innerHTML = `ページの読み込みに失敗しました。エラー: ${error.message} - 詳細: プロキシサーバーの問題、またはクロスオリジンの制限が原因かもしれません。`;
-            console.error('Error:', error);
-        });
-}
-
-window.addEventListener('DOMContentLoaded', loadPage);
-</script>
-
+        window.addEventListener('DOMContentLoaded', loadPage);
+    </script>
+</body>
 </html>
